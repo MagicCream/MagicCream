@@ -1,0 +1,2 @@
+# MagicCream
+Master Thesis Project

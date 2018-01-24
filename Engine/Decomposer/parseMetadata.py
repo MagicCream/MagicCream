@@ -12,72 +12,36 @@ tokens = (
 )
 PREFIX_NOTATION = "@prefix"
 
-t_PREFIX = r"[a-z](\S)*"+":"+r"[a-z](\S)*"
+t_PREFIX = r"[a-z](\S)*"+":"
 t_URI = r"<"+"\S+"+r">"
-t_POINT= r"\."
+t_POINT = r"\."
 
 t_ignore = ' \t\n'
 
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
 
-lexer = lex.lex()
+lexer = lex.lex(debug=1)
 
 # Parser
 
-def p_parse_sparql(p):
+def p_prefix_uri(p):
     """
-    parse_sparql : endpoints_list
+    prefix_uri : PREFIX URI POINT
     """
-    p[0] = p[1]
+    p[0] = p[2]
 
-def p_endpoints_list(p):
+def p_prefix_uri_list(p):
     """
-    endpoints_list : endpoints_list endpoint
+    prefix_uri_list : prefix_uri_list prefix_uri
     """
     p[0] = p[1] + [p[2]]
 
-def p_single_endpoint_list(p):
+def p_single_prefix_uri_list(p):
     """
-    endpoints_list : endpoint
-    """
-    p[0] = [p[1]]
-
-def p_endpoint(p):
-    """
-    endpoint : URI predicate_list POINT
-    """
-    p[0] = (p[1], p[2])
-
-def p_predicate_list(p):
-    """
-    predicate_list : predicate_list predicate
-    """
-    p[0] = p[1] + [p[2]]
-
-def p_single_predicate_list(p):
-    """
-    predicate_list : predicate
+    prefix_uri_list : prefix_uri
     """
     p[0] = [p[1]]
-
-def p_predicate_0(p):
-    """
-    predicate : PRED0
-    """
-    p[0] = p[1]
-
-def p_predicate_1(p):
-    """
-    predicate : PRED1
-    """
-    p[0] = p[1]
-
-def p_predicate_u(p):
-    """
-    predicate : URI
-    """
-    p[0] = p[1]
 
 def p_error(p):
         raise TypeError("unknown text at %r" % (p.value,))

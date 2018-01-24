@@ -1,0 +1,6 @@
+SELECT ?dataset ?variable WHERE {
+ ?dataset dct:spatial "mediterranean" .
+ ?dataset bdo:temporalCoverage "2017".
+ ?dataset disco:variable ?variable.
+ ?variable owl:sameAs cf:sea_water_temperature.
+}

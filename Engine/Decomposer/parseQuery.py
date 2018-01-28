@@ -95,10 +95,8 @@ def p_parse_sparql(p):
     """
     parse_sparql : prefix_list query
     """
-
-    for item in p:
-        print(item)
     (vs, ts, d) = p[2]
+    print(p[1])
     p[0] = Query(p[1], vs, ts, d)
 
 def p_prefix_list(p):
@@ -386,5 +384,4 @@ parser = yacc.yacc(debug=0)
 # Helpers
 
 def parse(string):
-
-    return parser.parse(string, lexer=lexer)
+    return parser.parse(string, lexer=lexer,)

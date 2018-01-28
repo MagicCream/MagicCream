@@ -1,0 +1,91 @@
+Created by PLY version 3.3 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> prefix_uri_list
+Rule 1     prefix_uri_list -> prefix_uri prefix_uri_list
+Rule 2     prefix_uri_list -> prefix_uri
+Rule 3     prefix_uri -> PREFIX SEPARATOR URI POINT
+
+Terminals, with rules where they appear
+
+POINT                : 3
+PREFIX               : 3
+SEPARATOR            : 3
+URI                  : 3
+error                : 
+
+Nonterminals, with rules where they appear
+
+prefix_uri           : 1 2
+prefix_uri_list      : 1 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . prefix_uri_list
+    (1) prefix_uri_list -> . prefix_uri prefix_uri_list
+    (2) prefix_uri_list -> . prefix_uri
+    (3) prefix_uri -> . PREFIX SEPARATOR URI POINT
+
+    PREFIX          shift and go to state 2
+
+    prefix_uri                     shift and go to state 1
+    prefix_uri_list                shift and go to state 3
+
+state 1
+
+    (1) prefix_uri_list -> prefix_uri . prefix_uri_list
+    (2) prefix_uri_list -> prefix_uri .
+    (1) prefix_uri_list -> . prefix_uri prefix_uri_list
+    (2) prefix_uri_list -> . prefix_uri
+    (3) prefix_uri -> . PREFIX SEPARATOR URI POINT
+
+    $end            reduce using rule 2 (prefix_uri_list -> prefix_uri .)
+    PREFIX          shift and go to state 2
+
+    prefix_uri                     shift and go to state 1
+    prefix_uri_list                shift and go to state 4
+
+state 2
+
+    (3) prefix_uri -> PREFIX . SEPARATOR URI POINT
+
+    SEPARATOR       shift and go to state 5
+
+
+state 3
+
+    (0) S' -> prefix_uri_list .
+
+
+
+state 4
+
+    (1) prefix_uri_list -> prefix_uri prefix_uri_list .
+
+    $end            reduce using rule 1 (prefix_uri_list -> prefix_uri prefix_uri_list .)
+
+
+state 5
+
+    (3) prefix_uri -> PREFIX SEPARATOR . URI POINT
+
+    URI             shift and go to state 6
+
+
+state 6
+
+    (3) prefix_uri -> PREFIX SEPARATOR URI . POINT
+
+    POINT           shift and go to state 7
+
+
+state 7
+
+    (3) prefix_uri -> PREFIX SEPARATOR URI POINT .
+
+    PREFIX          reduce using rule 3 (prefix_uri -> PREFIX SEPARATOR URI POINT .)
+    $end            reduce using rule 3 (prefix_uri -> PREFIX SEPARATOR URI POINT .)
+

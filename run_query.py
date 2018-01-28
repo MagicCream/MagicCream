@@ -43,7 +43,7 @@ def runQuery(query_file, endpoint_file, buffer_size):
     global time1
     qname = qu
     time1 = time()
-    new_query = decomposer.makePlan(query,endpoint_file)
+    new_query = decomposer.makePlan(query, endpoint_file)
     print(new_query)
     # dt = time() - time1
     # if (p == "d") or (k == "y"):  # to show the decomposition or the plan

@@ -4,14 +4,16 @@ from ply import lex, yacc
 # Lexer
 # TODO metadata
 # TODO cache
+reserved = {
+    '@prefix': 'PREFIX',
+}
 
-tokens = (
+tokens = [
     "PREFIX",
     "URI",
     "SEPARATOR",
     "POINT"
-)
-PREFIX_NOTATION = "@prefix"
+] + list(reserved.values())
 
 t_PREFIX = r"[a-z](\S)*(?=: )"
 t_URI = r"<"+"\S+"+r">"
@@ -23,7 +25,7 @@ t_ignore = ' \t\n\r'
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
 
-lexer = lex.lex(debug=1)
+lexer = lex.lex()
 
 # Parser
 
@@ -49,14 +51,14 @@ def p_prefix_uri(p):
 def p_error(p):
         raise TypeError("unknown text at %r" % (p.value,))
 
-parser = yacc.yacc(debug=1)
+parser = yacc.yacc()
 
 # Helpers
 
 def parse(file):
     meta_data = ""
     for line in file.readlines():
-        if line.startswith(PREFIX_NOTATION):
+        if line.startswith("@prefix"):
             meta_data += line[8:]
         else :
             break

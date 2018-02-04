@@ -4,58 +4,63 @@ from ply import lex, yacc
 # Lexer
 # TODO metadata
 # TODO cache
+reserved = {
+    '@prefix': 'PREFIX',
+}
 
-tokens = (
+tokens = [
     "PREFIX",
     "URI",
+    "SEPARATOR",
     "POINT"
-)
-PREFIX_NOTATION = "@prefix"
+] + list(reserved.values())
 
-t_PREFIX = r"[a-z](\S)*"+":"
+t_PREFIX = r"[a-z](\S)*(?=: )"
 t_URI = r"<"+"\S+"+r">"
+t_SEPARATOR = r":"
 t_POINT = r"\."
 
-t_ignore = ' \t\n'
+t_ignore = ' \t\n\r'
 
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
 
-lexer = lex.lex(debug=1)
+lexer = lex.lex()
 
 # Parser
 
-def p_prefix_uri(p):
+def p_prefix_uri_list_1(p):
     """
-    prefix_uri : PREFIX URI POINT
+    prefix_uri_list : prefix_uri prefix_uri_list
     """
-    p[0] = p[2]
+    p[1].update(p[2])
+    p[0] = p[1]
 
-def p_prefix_uri_list(p):
-    """
-    prefix_uri_list : prefix_uri_list prefix_uri
-    """
-    p[0] = p[1] + [p[2]]
-
-def p_single_prefix_uri_list(p):
+def p_prefix_uri_list_2(p):
     """
     prefix_uri_list : prefix_uri
     """
-    p[0] = [p[1]]
+    p[0] = p[1]
+
+def p_prefix_uri(p):
+    """
+    prefix_uri : PREFIX SEPARATOR URI POINT
+    """
+    p[0] = {p[1]:p[3]}
 
 def p_error(p):
         raise TypeError("unknown text at %r" % (p.value,))
 
-parser = yacc.yacc(debug=0)
+parser = yacc.yacc()
 
 # Helpers
 
 def parse(file):
     meta_data = ""
     for line in file.readlines():
-        if line.startswith(PREFIX_NOTATION):
+        if line.startswith("@prefix"):
             meta_data += line[8:]
         else :
             break
-
-    return parser.parse(meta_data, lexer=lexer)
+    rlt = parser.parse(meta_data, lexer=lexer)
+    return rlt

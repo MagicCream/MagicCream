@@ -833,6 +833,16 @@ def decompose(qString, eFile, decomposition, contact):
     # print query
     return query
 
+def decomposeTest(qFile):
+    rlt = ""
+    if qFile:
+        try:
+            with open(qFile) as qfile:
+                rlt = parseQuery.parse(qfile.read())
+        except :
+            pass
+        print(rlt)
+        return rlt
 
 def decomposeMetadata(qString, mFile, decomposition, contact):
     endpointList = None

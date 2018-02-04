@@ -1,3 +1,5 @@
+@prefix dct: <http://purl.org/dc/terms/> .
+
 SELECT ?dataset ?variable WHERE {
  ?dataset dct:spatial "mediterranean" .
  ?dataset bdo:temporalCoverage "2017".

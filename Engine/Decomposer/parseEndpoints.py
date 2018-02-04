@@ -20,7 +20,7 @@ t_ignore = ' \t\n'
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
 3
-lexer = lex.lex()
+lexer = lex.lex(debug=1)
 
 # Parser
 

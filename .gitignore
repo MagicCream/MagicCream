@@ -66,6 +66,8 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
+.idea/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

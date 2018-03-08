@@ -10,7 +10,7 @@ tokens = (
     "POINT"
 )
 
-t_PRED0 = r"[a-z](\S)*"+":"+r"[a-z](\S)*"
+t_PRED0 =  +r"[a-z](\S)*"
 t_PRED1 = r"[a-z](\S)*"+":"+r"<"+"\S+"+r">"
 t_URI = r"<"+"\S+"+r">"
 t_POINT= r"\."

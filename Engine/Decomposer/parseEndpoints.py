@@ -20,7 +20,7 @@ t_ignore = ' \t\n'
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
 3
-lexer = lex.lex(debug=1)
+lexer = lex.lex()
 
 # Parser
 
@@ -81,7 +81,7 @@ def p_predicate_u(p):
 def p_error(p):
         raise TypeError("unknown text at %r" % (p.value,))
 
-parser = yacc.yacc(debug=0)
+parser = yacc.yacc()
 
 # Helpers
 

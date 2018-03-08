@@ -154,7 +154,7 @@ def t_newline(t):
     t.lexer.lineno += t.value.count("\n")
 
 
-lexer = lex.lex(debug=1)
+lexer = lex.lex()
 
 
 # Parser
@@ -1001,8 +1001,7 @@ def p_error(p):
         value = p.value
     raise TypeError("unknown text at %r" % (value,))
 
-
-parser = yacc.yacc(debug=1)
+parser = yacc.yacc()
 
 
 # Helpers

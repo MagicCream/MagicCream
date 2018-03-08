@@ -11,7 +11,6 @@ reserved = {
     'SELECT': 'SELECT',
     'DISTINCT': 'DISTINCT',
     'WHERE': 'WHERE',
-    '@perfix': 'PREFIX',
     'LIMIT': 'LIMIT',
     'OFFSET': 'OFFSET',
     'ORDER': 'ORDER',
@@ -81,7 +80,8 @@ tokens = [
              "UNSIGNEDSHORT",
              "UNSIGNEDBYTE",
              "POSITIVEINT",
-             "OR"
+             "OR",
+             "PREFIX",
          ] + list(reserved.values())
 
 
@@ -140,6 +140,7 @@ t_UNSIGNEDINT = r"xsd\:unsignedInt"
 t_UNSIGNEDSHORT = r"xsd\:unsignedShort"
 t_UNSIGNEDBYTE = r"xsd\:unsignedByte"
 t_POSITIVEINT = r"xsd\:positiveInteger"
+t_PREFIX = r"@prefix"
 t_ignore = ' \t\n\r'
 
 
@@ -150,10 +151,10 @@ def t_error(t):
 # Define a rule so we can track line numbers
 def t_newline(t):
     r'\n+'
-    t.lexer.lineno += len(t.value)
+    t.lexer.lineno += t.value.count("\n")
 
 
-lexer = lex.lex(debug=1)
+lexer = lex.lex()
 
 
 # Parser
@@ -189,9 +190,8 @@ def p_empty(p):
 
 def p_prefix(p):
     """
-    prefix : PREFIX uri
+    prefix : PREFIX uri POINT
     """
-    print("p_prefix")
     p[0] = p[2]
 
 
@@ -995,19 +995,16 @@ def p_object_constant(p):
 
 
 def p_error(p):
-    print(p)
     if isinstance(p, str):
         value = p
     else:
         value = p.value
     raise TypeError("unknown text at %r" % (value,))
 
-
-parser = yacc.yacc(debug=1)
+parser = yacc.yacc()
 
 
 # Helpers
 
 def parse(string):
-    print(string)
     return parser.parse(string, lexer=lexer)

@@ -17,11 +17,18 @@ import string
 from multiprocessing import Process, Queue, active_children, Manager
 from time import time
 from Engine.Decomposer import decomposer
+from Engine.Planner import Plan
+
+from Engine.Planner.Plan import contactSource, contactProxy
 import traceback
 
 
-def runQuery(query_file, endpoint_file, buffer_size):
+def runQuery(query_file, endpoint_file, buffer_size, simulated, endpointType, res):
 
+    if simulated:
+        contact = contactProxy
+    else:
+        contact = contactSource
     query = open(query_file).read()
     pos = string.rfind(query_file, "/")
     qu = query_file[pos + 1:]
@@ -45,42 +52,40 @@ def runQuery(query_file, endpoint_file, buffer_size):
     time1 = time()
     new_query = decomposer.makePlan(query, endpoint_file)
     print(new_query)
-    # dt = time() - time1
+    dt = time() - time1
     # if (p == "d") or (k == "y"):  # to show the decomposition or the plan
     #     print str(new_query)
     #     return
     # elif (k == "c"):  # to show the input for rdf3x
     #     print str(new_query.show2())
     #     return
-    #
-    # if (new_query == None):  # if the query could not be answered by the endpoints
-    #     time2 = time() - time1
-    #     t1 = time2
-    #     tn = time2
-    #     pt = time2
-    #     printInfo()
-    #     return
-    # plan = Plan.createPlan(new_query, a, wc, buffer_size, contact, endpointType)
-    #
-    # pt = time() - time1
-    # # print 'creando procesos'
-    # p2 = Process(target=plan.execute, args=(res,))
-    # p2.start()
-    # print(p2.pid)
-    # p3 = Process(target=conclude, args=(res, printResults, t1, tn, c1, cn, time1, qname, dt, pt))
-    # p3.start()
-    # print(p3.pid)
-    # signal.signal(signal.SIGTERM, onSignal1)
-    #
-    # while True:
-    #     if p2.is_alive() and not p3.is_alive():
-    #         try:
-    #             os.kill(p2.pid, 9)
-    #         except Exception as ex:
-    #             continue
-    #         break
-    #     elif not p2.is_alive() and not p3.is_alive():
-    #         break
+
+    if (new_query == None):  # if the query could not be answered by the endpoints
+        time2 = time() - time1
+        t1 = time2
+        tn = time2
+        pt = time2
+        printInfo()
+        return
+    plan = Plan.createPlan(new_query, adaptive=True, wc=True, buffersize=buffer_size, c=contact, endpointType=endpointType)
+
+    pt = time() - time1
+    # print 'creando procesos'
+    p2 = Process(target=plan.execute, args=(res,))
+    p2.start()
+    p3 = Process(target=conclude, args=(res, False, t1, tn, c1, cn, time1, qname, dt, pt))
+    p3.start()
+    signal.signal(signal.SIGTERM, onSignal1)
+
+    while True:
+        if p2.is_alive() and not p3.is_alive():
+            try:
+                os.kill(p2.pid, 9)
+            except Exception as ex:
+                continue
+            break
+        elif not p2.is_alive() and not p3.is_alive():
+            break
 
 
 def conclude(res, printResults, _t1, _tn, _c1, _cn, _time1, _qname, _dt, _pt):
@@ -167,12 +172,12 @@ def onSignal2(s, stackframe):
 
 def usage():
     usage_str = ("Usage: {program} -e <endpoints_file> -q <query_file>")
-    print usage_str.format(program=sys.argv[0]),
+    print(usage_str.format(program=sys.argv[0])),
 
 
 def  get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:e:q:b:")
+        opts, args = getopt.getopt(argv, "h:e:q:st")
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -180,8 +185,9 @@ def  get_options(argv):
     endpointfile = None
     queryfile = None
     buffersize = 16384
-
+    endpointType = False
     printResults = False
+    simulated = False
 
     for opt, arg in opts:
         if opt == "-h":
@@ -193,11 +199,15 @@ def  get_options(argv):
             queryfile = arg
         elif opt == "-b":
             buffersize = int(arg)
+        elif opt == "-s":
+            simulated = True
+        elif opt == '-t':
+            endpointType = True
 
     if not endpointfile or not queryfile:
         usage()
         sys.exit(1)
-    return (endpointfile, queryfile, buffersize)
+    return (endpointfile, queryfile, buffersize, simulated, endpointType)
 
 
 def main(argv):
@@ -205,9 +215,9 @@ def main(argv):
     # res = manager.Queue()
     res = Queue()
     time1 = time()
-    (endpoint, query, buffersize) = get_options(argv[1:])
+    (endpoint, query, buffersize, simulated, endpointType) = get_options(argv[1:])
     try:
-        runQuery(query, endpoint, buffersize)
+        runQuery(query, endpoint, buffersize, simulated, endpointType, res)
     except Exception as ex:
         print(traceback.format_exc())
         # print(ex)

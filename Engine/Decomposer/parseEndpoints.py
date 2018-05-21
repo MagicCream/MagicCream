@@ -10,7 +10,7 @@ tokens = (
     "POINT"
 )
 
-t_PRED0 =  +r"[a-z](\S)*"
+t_PRED0 = r"[a-z](\S)*"+":"+r"[a-z](\S)*"
 t_PRED1 = r"[a-z](\S)*"+":"+r"<"+"\S+"+r">"
 t_URI = r"<"+"\S+"+r">"
 t_POINT= r"\."
@@ -19,7 +19,7 @@ t_ignore = ' \t\n'
 
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
-3
+
 lexer = lex.lex()
 
 # Parser
